@@ -7,6 +7,7 @@ import authRoutes from "./routes/auth";
 import bulkRoutes from "./routes/bulk";
 import categoryRoutes from "./routes/categories";
 import productRoutes from "./routes/products";
+import reportRoutes from "./routes/reports";
 import userRoutes from "./routes/users";
 
 dotenv.config();
@@ -32,6 +33,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/products", bulkRoutes);
+app.use("/api/reports", reportRoutes);
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
