@@ -5,6 +5,7 @@
       @if (auth.isLoggedIn()) {
         <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
         <a routerLink="/categories" routerLinkActive="active">Categories</a>
+        <a routerLink="/products" routerLinkActive="active">Products</a>
         <button type="button" class="link-btn" (click)="logout()">Logout</button>
       } @else {
         <a routerLink="/login" routerLinkActive="active">Login</a>

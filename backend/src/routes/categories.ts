@@ -52,6 +52,15 @@ router.put("/:id", async (req: AuthRequest, res: Response) => {
 });
 
 router.delete("/:id", async (req: AuthRequest, res: Response) => {
+  const productCount = await prisma.product.count({
+    where: { categoryId: req.params.id },
+  });
+  if (productCount > 0) {
+    return res
+      .status(400)
+      .json({ error: "Cannot delete category with existing products" });
+  }
+
   try {
     await prisma.category.delete({ where: { id: req.params.id } });
     res.status(204).send();
