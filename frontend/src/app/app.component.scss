@@ -25,6 +25,19 @@
       color: #fff;
     }
   }
+
+  .link-btn {
+    background: none;
+    border: none;
+    color: #cbd5e1;
+    cursor: pointer;
+    margin-left: 1rem;
+    font-size: inherit;
+
+    &:hover {
+      color: #fff;
+    }
+  }
 }
 
 .container {
