@@ -23,6 +23,7 @@ export class UiButtonComponent {
   type = input<'button' | 'submit' | 'reset'>('button');
   disabled = input(false);
   clicked = output<MouseEvent>();
+  btnClass = input('');
 
   classes() {
     const base =
@@ -42,6 +43,6 @@ export class UiButtonComponent {
       lg: 'h-11 rounded-md px-8',
     };
 
-    return `${base} ${variants[this.variant()]} ${sizes[this.size()]}`;
+    return `${base} ${variants[this.variant()]} ${sizes[this.size()]} ${this.btnClass()}`.trim();
   }
 }

@@ -18,6 +18,16 @@
           </span>
           <ui-button variant="outline" size="sm" (clicked)="logout()">Logout</ui-button>
         </div>
+      } @else {
+        <div class="flex items-center gap-2">
+          <a routerLink="/login" class="text-sm text-muted-foreground hover:text-foreground">Sign in</a>
+          <a
+            routerLink="/register"
+            class="inline-flex h-8 items-center rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground hover:opacity-90"
+          >
+            Register
+          </a>
+        </div>
       }
     </div>
   </header>

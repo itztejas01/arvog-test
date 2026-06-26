@@ -1,22 +1,32 @@
-<section class="card card--narrow">
-  <h2>Register</h2>
-  <form class="form-stack" [formGroup]="form" (ngSubmit)="submit()">
-    <label class="field">
-      Email
-      <input type="email" formControlName="email" />
-    </label>
-    <label class="field">
-      Password
-      <input type="password" formControlName="password" />
-    </label>
-    @if (error) {
-    <p class="error">{{ error }}</p>
-    }
-    <button class="btn" type="submit" [disabled]="form.invalid || loading">
-      Register
-    </button>
-  </form>
-  <p class="auth-footer">
-    Already have an account? <a routerLink="/login">Login</a>
-  </p>
-</section>
+<div class="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-8">
+  <ui-card class="w-full max-w-md">
+    <ui-card-header>
+      <ui-card-title>Create your Avrog account</ui-card-title>
+      <ui-card-description>Register to manage products and categories.</ui-card-description>
+    </ui-card-header>
+    <ui-card-content>
+      <form class="space-y-4" [formGroup]="form" (ngSubmit)="submit()">
+        <div class="space-y-2">
+          <ui-label>Email</ui-label>
+          <input uiInput type="email" formControlName="email" placeholder="you@example.com" />
+        </div>
+        <div class="space-y-2">
+          <ui-label>Password</ui-label>
+          <input uiInput type="password" formControlName="password" placeholder="At least 6 characters" />
+        </div>
+        @if (error) {
+          <p class="text-sm text-destructive">{{ error }}</p>
+        }
+        <ui-button btnClass="w-full" type="submit" [disabled]="form.invalid || loading">
+          {{ loading ? 'Creating account...' : 'Create account' }}
+        </ui-button>
+      </form>
+      <p class="mt-4 text-center text-sm text-muted-foreground">
+        Already have an account?
+        <a routerLink="/login" class="font-medium text-foreground underline-offset-4 hover:underline">
+          Sign in
+        </a>
+      </p>
+    </ui-card-content>
+  </ui-card>
+</div>

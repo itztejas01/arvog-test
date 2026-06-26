@@ -3,18 +3,47 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Category, CategoryService } from '../../services/category.service';
 import { Product, ProductService } from '../../services/product.service';
+import {
+  UiButtonComponent,
+  UiCardComponent,
+  UiCardContentComponent,
+  UiCardHeaderComponent,
+  UiCardTitleComponent,
+  UiInputDirective,
+  UiLabelComponent,
+  uiTableCellClass,
+  uiTableClass,
+  uiTableHeadClass,
+  uiTableHeaderCellClass,
+  uiTableRowClass,
+} from '../../shared/ui';
 
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [ReactiveFormsModule, DecimalPipe],
+  imports: [
+    ReactiveFormsModule,
+    DecimalPipe,
+    UiButtonComponent,
+    UiCardComponent,
+    UiCardHeaderComponent,
+    UiCardTitleComponent,
+    UiCardContentComponent,
+    UiLabelComponent,
+    UiInputDirective,
+  ],
   templateUrl: './products.component.html',
-  styleUrl: './products.component.scss',
 })
 export class ProductsComponent implements OnInit {
   productService = inject(ProductService);
   private categoryService = inject(CategoryService);
   private fb = inject(FormBuilder);
+
+  tableClass = uiTableClass;
+  tableHeadClass = uiTableHeadClass;
+  tableRowClass = uiTableRowClass;
+  tableCellClass = uiTableCellClass;
+  tableHeaderCellClass = uiTableHeaderCellClass;
 
   products: Product[] = [];
   categories: Category[] = [];

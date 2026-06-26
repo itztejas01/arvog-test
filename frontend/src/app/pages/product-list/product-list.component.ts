@@ -3,16 +3,41 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Product, ProductService } from '../../services/product.service';
+import {
+  UiButtonComponent,
+  UiCardComponent,
+  UiCardContentComponent,
+  UiInputDirective,
+  UiLabelComponent,
+  uiTableCellClass,
+  uiTableClass,
+  uiTableHeadClass,
+  uiTableHeaderCellClass,
+  uiTableRowClass,
+} from '../../shared/ui';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [ReactiveFormsModule, DecimalPipe],
+  imports: [
+    ReactiveFormsModule,
+    DecimalPipe,
+    UiButtonComponent,
+    UiCardComponent,
+    UiCardContentComponent,
+    UiLabelComponent,
+    UiInputDirective,
+  ],
   templateUrl: './product-list.component.html',
-  styleUrl: './product-list.component.scss',
 })
 export class ProductListComponent implements OnInit {
   productService = inject(ProductService);
+
+  tableClass = uiTableClass;
+  tableHeadClass = uiTableHeadClass;
+  tableRowClass = uiTableRowClass;
+  tableCellClass = uiTableCellClass;
+  tableHeaderCellClass = uiTableHeaderCellClass;
 
   products: Product[] = [];
   page = 1;

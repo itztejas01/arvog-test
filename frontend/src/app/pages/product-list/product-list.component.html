@@ -1,72 +1,84 @@
-<section class="card">
-  <h2>Product List</h2>
-
-  <div class="toolbar">
-    <input
-      class="search-input"
-      type="search"
-      [formControl]="searchControl"
-      placeholder="Search by product or category name"
-    />
-    <label class="field">
-      Sort by price
-      <select [formControl]="sortControl">
-        <option value="asc">Low to high</option>
-        <option value="desc">High to low</option>
-      </select>
-    </label>
+<div class="space-y-6">
+  <div>
+    <h1 class="text-3xl font-bold tracking-tight">Product List</h1>
+    <p class="text-muted-foreground">Server-side pagination, price sorting, and search.</p>
   </div>
+
+  <ui-card>
+    <ui-card-content class="pt-6">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-end">
+        <div class="flex-1 space-y-2">
+          <ui-label>Search</ui-label>
+          <input
+            uiInput
+            type="search"
+            [formControl]="searchControl"
+            placeholder="Product or category name"
+          />
+        </div>
+        <div class="space-y-2 sm:w-48">
+          <ui-label>Sort by price</ui-label>
+          <select uiInput [formControl]="sortControl">
+            <option value="asc">Low to high</option>
+            <option value="desc">High to low</option>
+          </select>
+        </div>
+      </div>
+    </ui-card-content>
+  </ui-card>
 
   @if (error) {
-  <p class="error">{{ error }}</p>
+    <p class="text-sm text-destructive">{{ error }}</p>
   }
 
-  <table class="data-table">
-    <thead>
-      <tr>
-        <th>Image</th>
-        <th>Name</th>
-        <th>Category</th>
-        <th>Price</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (product of products; track product.id) {
-      <tr>
-        <td>
-          @if (productService.imageUrl(product.imagePath); as url) {
-          <img [src]="url" alt="" class="thumb" />
-          } @else { — }
-        </td>
-        <td>{{ product.name }}</td>
-        <td>{{ product.category?.name }}</td>
-        <td>{{ product.price | number : "1.2-2" }}</td>
-      </tr>
-      } @empty {
-      <tr>
-        <td colspan="4">No products found.</td>
-      </tr>
-      }
-    </tbody>
-  </table>
+  <ui-card>
+    <ui-card-content class="p-0">
+      <div class="overflow-x-auto">
+        <table [class]="tableClass">
+          <thead [class]="tableHeadClass">
+            <tr [class]="tableRowClass">
+              <th [class]="tableHeaderCellClass">Image</th>
+              <th [class]="tableHeaderCellClass">Name</th>
+              <th [class]="tableHeaderCellClass">Category</th>
+              <th [class]="tableHeaderCellClass">Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (product of products; track product.id) {
+              <tr [class]="tableRowClass">
+                <td [class]="tableCellClass">
+                  @if (productService.imageUrl(product.imagePath); as url) {
+                    <img [src]="url" alt="" class="h-12 w-12 rounded-md object-cover" />
+                  } @else {
+                    <span class="text-muted-foreground">—</span>
+                  }
+                </td>
+                <td [class]="tableCellClass">{{ product.name }}</td>
+                <td [class]="tableCellClass">{{ product.category?.name }}</td>
+                <td [class]="tableCellClass">{{ product.price | number: '1.2-2' }}</td>
+              </tr>
+            } @empty {
+              <tr [class]="tableRowClass">
+                <td [class]="tableCellClass" colspan="4">No products found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </ui-card-content>
+  </ui-card>
 
-  <div class="pagination">
-    <button
-      class="btn"
-      type="button"
-      [disabled]="page <= 1"
-      (click)="goToPage(page - 1)"
-    >
-      Previous
-    </button>
-    <span>Page {{ page }} of {{ totalPages }} ({{ total }} items)</span>
-    <button
-      class="btn"
-      type="button"
-      [disabled]="page >= totalPages"
-      (click)="goToPage(page + 1)"
-    >
-      Next
-    </button>
+  <div class="flex items-center justify-between gap-4">
+    <p class="text-sm text-muted-foreground">
+      Page {{ page }} of {{ totalPages }} · {{ total }} items
+    </p>
+    <div class="flex gap-2">
+      <ui-button variant="outline" size="sm" [disabled]="page <= 1" (clicked)="goToPage(page - 1)">
+        Previous
+      </ui-button>
+      <ui-button variant="outline" size="sm" [disabled]="page >= totalPages" (clicked)="goToPage(page + 1)">
+        Next
+      </ui-button>
+    </div>
   </div>
-</section>
+</div>

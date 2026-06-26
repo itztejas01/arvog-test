@@ -2,13 +2,33 @@ import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
+import {
+  UiButtonComponent,
+  UiCardComponent,
+  UiCardContentComponent,
+  UiCardDescriptionComponent,
+  UiCardHeaderComponent,
+  UiCardTitleComponent,
+  UiInputDirective,
+  UiLabelComponent,
+} from '../../shared/ui';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    UiButtonComponent,
+    UiCardComponent,
+    UiCardHeaderComponent,
+    UiCardTitleComponent,
+    UiCardDescriptionComponent,
+    UiCardContentComponent,
+    UiLabelComponent,
+    UiInputDirective,
+  ],
   templateUrl: './register.component.html',
-  styleUrl: './register.component.scss',
 })
 export class RegisterComponent {
   private fb = inject(FormBuilder);

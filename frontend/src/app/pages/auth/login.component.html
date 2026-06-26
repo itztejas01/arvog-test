@@ -1,20 +1,32 @@
-<section class="card card--narrow">
-  <h2>Login</h2>
-  <form class="form-stack" [formGroup]="form" (ngSubmit)="submit()">
-    <label class="field">
-      Email
-      <input type="email" formControlName="email" />
-    </label>
-    <label class="field">
-      Password
-      <input type="password" formControlName="password" />
-    </label>
-    @if (error) {
-    <p class="error">{{ error }}</p>
-    }
-    <button class="btn" type="submit" [disabled]="form.invalid || loading">
-      Login
-    </button>
-  </form>
-  <p class="auth-footer">No account? <a routerLink="/register">Register</a></p>
-</section>
+<div class="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-8">
+  <ui-card class="w-full max-w-md">
+    <ui-card-header>
+      <ui-card-title>Sign in to Avrog</ui-card-title>
+      <ui-card-description>Enter your credentials to access the dashboard.</ui-card-description>
+    </ui-card-header>
+    <ui-card-content>
+      <form class="space-y-4" [formGroup]="form" (ngSubmit)="submit()">
+        <div class="space-y-2">
+          <ui-label>Email</ui-label>
+          <input uiInput type="email" formControlName="email" placeholder="you@example.com" />
+        </div>
+        <div class="space-y-2">
+          <ui-label>Password</ui-label>
+          <input uiInput type="password" formControlName="password" placeholder="••••••••" />
+        </div>
+        @if (error) {
+          <p class="text-sm text-destructive">{{ error }}</p>
+        }
+        <ui-button btnClass="w-full" type="submit" [disabled]="form.invalid || loading">
+          {{ loading ? 'Signing in...' : 'Sign in' }}
+        </ui-button>
+      </form>
+      <p class="mt-4 text-center text-sm text-muted-foreground">
+        No account?
+        <a routerLink="/register" class="font-medium text-foreground underline-offset-4 hover:underline">
+          Create one
+        </a>
+      </p>
+    </ui-card-content>
+  </ui-card>
+</div>

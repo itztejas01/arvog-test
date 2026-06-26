@@ -3,15 +3,32 @@ import {
   BulkImportResult,
   BulkUploadService,
 } from '../../services/bulk-upload.service';
+import {
+  UiBadgeComponent,
+  UiButtonComponent,
+  UiCardComponent,
+  UiCardContentComponent,
+  uiTableCellClass,
+  uiTableClass,
+  uiTableHeadClass,
+  uiTableHeaderCellClass,
+  uiTableRowClass,
+} from '../../shared/ui';
 
 @Component({
   selector: 'app-bulk-upload',
   standalone: true,
+  imports: [UiButtonComponent, UiCardComponent, UiCardContentComponent, UiBadgeComponent],
   templateUrl: './bulk-upload.component.html',
-  styleUrl: './bulk-upload.component.scss',
 })
 export class BulkUploadComponent {
   private bulkService = inject(BulkUploadService);
+
+  tableClass = uiTableClass;
+  tableHeadClass = uiTableHeadClass;
+  tableRowClass = uiTableRowClass;
+  tableCellClass = uiTableCellClass;
+  tableHeaderCellClass = uiTableHeaderCellClass;
 
   selectedFile: File | null = null;
   uploading = false;

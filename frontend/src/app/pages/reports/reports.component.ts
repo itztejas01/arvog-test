@@ -2,13 +2,32 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Category, CategoryService } from '../../services/category.service';
 import { ReportService } from '../../services/report.service';
+import {
+  UiButtonComponent,
+  UiCardComponent,
+  UiCardContentComponent,
+  UiCardDescriptionComponent,
+  UiCardHeaderComponent,
+  UiCardTitleComponent,
+  UiInputDirective,
+  UiLabelComponent,
+} from '../../shared/ui';
 
 @Component({
   selector: 'app-reports',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [
+    ReactiveFormsModule,
+    UiButtonComponent,
+    UiCardComponent,
+    UiCardHeaderComponent,
+    UiCardTitleComponent,
+    UiCardDescriptionComponent,
+    UiCardContentComponent,
+    UiLabelComponent,
+    UiInputDirective,
+  ],
   templateUrl: './reports.component.html',
-  styleUrl: './reports.component.scss',
 })
 export class ReportsComponent implements OnInit {
   private reportService = inject(ReportService);

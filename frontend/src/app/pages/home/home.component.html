@@ -1,11 +1,25 @@
-<section class="card">
-  <h2>Welcome to Avrog</h2>
-  <p>Manage categories, products, bulk imports, and reports from one place.</p>
-  <nav class="link-list">
-    <a routerLink="/categories">Manage Categories</a>
-    <a routerLink="/products">Manage Products</a>
-    <a routerLink="/product-list">Browse Product List</a>
-    <a routerLink="/bulk-upload">Bulk Upload</a>
-    <a routerLink="/reports">Download Reports</a>
-  </nav>
-</section>
+<div class="space-y-6">
+  <div>
+    <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
+    <p class="text-muted-foreground">Welcome to Avrog — manage your product catalog end to end.</p>
+  </div>
+
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    @for (item of quickLinks; track item.path) {
+      <ui-card class="transition-shadow hover:shadow-md">
+        <ui-card-header>
+          <ui-card-title class="text-lg">{{ item.title }}</ui-card-title>
+          <ui-card-description>{{ item.description }}</ui-card-description>
+        </ui-card-header>
+        <ui-card-content>
+          <a
+            [routerLink]="item.path"
+            class="text-sm font-medium text-foreground underline-offset-4 hover:underline"
+          >
+            Open →
+          </a>
+        </ui-card-content>
+      </ui-card>
+    }
+  </div>
+</div>

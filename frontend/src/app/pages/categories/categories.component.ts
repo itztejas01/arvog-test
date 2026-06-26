@@ -1,17 +1,43 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Category, CategoryService } from '../../services/category.service';
+import {
+  UiButtonComponent,
+  UiCardComponent,
+  UiCardContentComponent,
+  UiCardHeaderComponent,
+  UiCardTitleComponent,
+  UiInputDirective,
+  uiTableCellClass,
+  uiTableClass,
+  uiTableHeadClass,
+  uiTableHeaderCellClass,
+  uiTableRowClass,
+} from '../../shared/ui';
 
 @Component({
   selector: 'app-categories',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [
+    ReactiveFormsModule,
+    UiButtonComponent,
+    UiCardComponent,
+    UiCardHeaderComponent,
+    UiCardTitleComponent,
+    UiCardContentComponent,
+    UiInputDirective,
+  ],
   templateUrl: './categories.component.html',
-  styleUrl: './categories.component.scss',
 })
 export class CategoriesComponent implements OnInit {
   private categoryService = inject(CategoryService);
   private fb = inject(FormBuilder);
+
+  tableClass = uiTableClass;
+  tableHeadClass = uiTableHeadClass;
+  tableRowClass = uiTableRowClass;
+  tableCellClass = uiTableCellClass;
+  tableHeaderCellClass = uiTableHeaderCellClass;
 
   categories: Category[] = [];
   editingId: string | null = null;

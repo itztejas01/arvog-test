@@ -1,45 +1,43 @@
-<section class="card card--form">
-  <h2>Product Reports</h2>
-  <p>
-    Download product data as CSV or XLSX. Large exports are streamed to avoid
-    timeouts.
-  </p>
+<div class="space-y-6">
+  <div>
+    <h1 class="text-3xl font-bold tracking-tight">Reports</h1>
+    <p class="text-muted-foreground">Export your catalog as CSV or XLSX with optional filters.</p>
+  </div>
 
-  <form
-    class="form-stack report-form"
-    [formGroup]="form"
-    (ngSubmit)="download()"
-  >
-    <label class="field">
-      Format
-      <select formControlName="format">
-        <option value="csv">CSV</option>
-        <option value="xlsx">XLSX</option>
-      </select>
-    </label>
-    <label class="field">
-      Category (optional)
-      <select formControlName="categoryId">
-        <option value="">All categories</option>
-        @for (cat of categories; track cat.id) {
-        <option [value]="cat.id">{{ cat.name }}</option>
-        }
-      </select>
-    </label>
-    <label class="field">
-      Search (optional)
-      <input
-        type="search"
-        formControlName="search"
-        placeholder="Product or category name"
-      />
-    </label>
-    <button class="btn" type="submit" [disabled]="downloading">
-      {{ downloading ? "Generating..." : "Download Report" }}
-    </button>
-  </form>
-
-  @if (error) {
-  <p class="error">{{ error }}</p>
-  }
-</section>
+  <ui-card class="max-w-lg">
+    <ui-card-header>
+      <ui-card-title class="text-lg">Download report</ui-card-title>
+      <ui-card-description>Large exports are streamed to avoid timeouts.</ui-card-description>
+    </ui-card-header>
+    <ui-card-content>
+      <form class="space-y-4" [formGroup]="form" (ngSubmit)="download()">
+        <div class="space-y-2">
+          <ui-label>Format</ui-label>
+          <select uiInput formControlName="format">
+            <option value="csv">CSV</option>
+            <option value="xlsx">XLSX</option>
+          </select>
+        </div>
+        <div class="space-y-2">
+          <ui-label>Category (optional)</ui-label>
+          <select uiInput formControlName="categoryId">
+            <option value="">All categories</option>
+            @for (cat of categories; track cat.id) {
+              <option [value]="cat.id">{{ cat.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="space-y-2">
+          <ui-label>Search (optional)</ui-label>
+          <input uiInput type="search" formControlName="search" placeholder="Product or category name" />
+        </div>
+        <ui-button type="submit" [disabled]="downloading">
+          {{ downloading ? 'Generating...' : 'Download report' }}
+        </ui-button>
+      </form>
+      @if (error) {
+        <p class="mt-3 text-sm text-destructive">{{ error }}</p>
+      }
+    </ui-card-content>
+  </ui-card>
+</div>

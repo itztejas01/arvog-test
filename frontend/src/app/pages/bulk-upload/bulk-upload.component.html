@@ -1,46 +1,61 @@
-<section class="card">
-  <h2>Bulk Product Upload</h2>
-  <p>
-    Upload a CSV or XLSX file with columns: <code>name</code>,
-    <code>price</code>, <code>categoryName</code>.
-  </p>
-
-  <div class="upload-row">
-    <input type="file" accept=".csv,.xlsx" (change)="onFileChange($event)" />
-    <button
-      class="btn"
-      type="button"
-      [disabled]="!selectedFile || uploading"
-      (click)="upload()"
-    >
-      {{ uploading ? "Uploading..." : "Upload" }}
-    </button>
+<div class="space-y-6">
+  <div>
+    <h1 class="text-3xl font-bold tracking-tight">Bulk Upload</h1>
+    <p class="text-muted-foreground">
+      Import products from CSV or XLSX with columns:
+      <code class="rounded bg-muted px-1 py-0.5 text-xs">name</code>,
+      <code class="rounded bg-muted px-1 py-0.5 text-xs">price</code>,
+      <code class="rounded bg-muted px-1 py-0.5 text-xs">categoryName</code>.
+    </p>
   </div>
 
-  @if (error) {
-  <p class="error">{{ error }}</p>
-  } @if (result) {
-  <div class="summary">
-    <p><strong>Imported:</strong> {{ result.imported }}</p>
-    <p><strong>Failed:</strong> {{ result.failed }}</p>
-  </div>
+  <ui-card>
+    <ui-card-content class="space-y-4 pt-6">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <input
+          class="block w-full text-sm text-muted-foreground file:mr-4 file:rounded-md file:border-0 file:bg-muted file:px-4 file:py-2 file:text-sm file:font-medium"
+          type="file"
+          accept=".csv,.xlsx"
+          (change)="onFileChange($event)"
+        />
+        <ui-button [disabled]="!selectedFile || uploading" (clicked)="upload()">
+          {{ uploading ? 'Uploading...' : 'Upload file' }}
+        </ui-button>
+      </div>
 
-  @if (result.errors.length > 0) {
-  <table class="data-table">
-    <thead>
-      <tr>
-        <th>Row</th>
-        <th>Error</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (err of result.errors; track err.row + err.message) {
-      <tr>
-        <td>{{ err.row }}</td>
-        <td>{{ err.message }}</td>
-      </tr>
+      @if (error) {
+        <p class="text-sm text-destructive">{{ error }}</p>
       }
-    </tbody>
-  </table>
-  } }
-</section>
+
+      @if (result) {
+        <div class="flex gap-3">
+          <ui-badge variant="secondary">Imported: {{ result.imported }}</ui-badge>
+          <ui-badge [variant]="result.failed > 0 ? 'destructive' : 'secondary'">
+            Failed: {{ result.failed }}
+          </ui-badge>
+        </div>
+
+        @if (result.errors.length > 0) {
+          <div class="overflow-x-auto rounded-md border border-border">
+            <table [class]="tableClass">
+              <thead [class]="tableHeadClass">
+                <tr [class]="tableRowClass">
+                  <th [class]="tableHeaderCellClass">Row</th>
+                  <th [class]="tableHeaderCellClass">Error</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (err of result.errors; track err.row + err.message) {
+                  <tr [class]="tableRowClass">
+                    <td [class]="tableCellClass">{{ err.row }}</td>
+                    <td [class]="tableCellClass">{{ err.message }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      }
+    </ui-card-content>
+  </ui-card>
+</div>
