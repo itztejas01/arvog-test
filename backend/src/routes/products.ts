@@ -1,6 +1,5 @@
-import fs from "fs";
-import path from "path";
 import { Response, Router } from "express";
+import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma";
 import { deleteImageFile, upload } from "../lib/upload";
 import { AuthRequest, authMiddleware } from "../middleware/auth";
@@ -16,6 +15,43 @@ router.get("/", async (_req, res: Response) => {
     orderBy: { createdAt: "desc" },
   });
   res.json(products);
+});
+
+router.get("/list", async (req, res: Response) => {
+  const page = Math.max(1, Number(req.query.page) || 1);
+  const pageSize = Math.min(100, Math.max(1, Number(req.query.pageSize) || 10));
+  const sortOrder = req.query.sortOrder === "asc" ? "asc" : "desc";
+  const search = typeof req.query.search === "string" ? req.query.search.trim() : "";
+
+  const where: Prisma.ProductWhereInput = search
+    ? {
+        OR: [
+          { name: { contains: search, mode: "insensitive" } },
+          { category: { name: { contains: search, mode: "insensitive" } } },
+        ],
+      }
+    : {};
+
+  const [data, total] = await Promise.all([
+    prisma.product.findMany({
+      where,
+      include: { category: true },
+      orderBy: { price: sortOrder },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.product.count({ where }),
+  ]);
+
+  res.json({
+    data,
+    meta: {
+      page,
+      pageSize,
+      total,
+      totalPages: Math.ceil(total / pageSize) || 1,
+    },
+  });
 });
 
 router.get("/:id", async (req, res: Response) => {

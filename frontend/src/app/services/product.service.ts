@@ -39,4 +39,25 @@ export class ProductService {
   imageUrl(imagePath: string | null): string | null {
     return imagePath ? `/api/uploads/${imagePath}` : null;
   }
+
+  listPaginated(params: {
+    page: number;
+    pageSize: number;
+    sortOrder: 'asc' | 'desc';
+    search?: string;
+  }) {
+    const query = new URLSearchParams({
+      page: String(params.page),
+      pageSize: String(params.pageSize),
+      sortOrder: params.sortOrder,
+      sortBy: 'price',
+    });
+    if (params.search) {
+      query.set('search', params.search);
+    }
+    return this.http.get<{
+      data: Product[];
+      meta: { page: number; pageSize: number; total: number; totalPages: number };
+    }>(`/api/products/list?${query.toString()}`);
+  }
 }
