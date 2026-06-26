@@ -1,0 +1,46 @@
+<section class="card">
+  <h2>Bulk Product Upload</h2>
+  <p>
+    Upload a CSV or XLSX file with columns: <code>name</code>,
+    <code>price</code>, <code>categoryName</code>.
+  </p>
+
+  <div class="upload-row">
+    <input type="file" accept=".csv,.xlsx" (change)="onFileChange($event)" />
+    <button
+      class="btn"
+      type="button"
+      [disabled]="!selectedFile || uploading"
+      (click)="upload()"
+    >
+      {{ uploading ? "Uploading..." : "Upload" }}
+    </button>
+  </div>
+
+  @if (error) {
+  <p class="error">{{ error }}</p>
+  } @if (result) {
+  <div class="summary">
+    <p><strong>Imported:</strong> {{ result.imported }}</p>
+    <p><strong>Failed:</strong> {{ result.failed }}</p>
+  </div>
+
+  @if (result.errors.length > 0) {
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Row</th>
+        <th>Error</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (err of result.errors; track err.row + err.message) {
+      <tr>
+        <td>{{ err.row }}</td>
+        <td>{{ err.message }}</td>
+      </tr>
+      }
+    </tbody>
+  </table>
+  } }
+</section>

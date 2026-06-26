@@ -1,0 +1,45 @@
+<section class="card card--form">
+  <h2>Product Reports</h2>
+  <p>
+    Download product data as CSV or XLSX. Large exports are streamed to avoid
+    timeouts.
+  </p>
+
+  <form
+    class="form-stack report-form"
+    [formGroup]="form"
+    (ngSubmit)="download()"
+  >
+    <label class="field">
+      Format
+      <select formControlName="format">
+        <option value="csv">CSV</option>
+        <option value="xlsx">XLSX</option>
+      </select>
+    </label>
+    <label class="field">
+      Category (optional)
+      <select formControlName="categoryId">
+        <option value="">All categories</option>
+        @for (cat of categories; track cat.id) {
+        <option [value]="cat.id">{{ cat.name }}</option>
+        }
+      </select>
+    </label>
+    <label class="field">
+      Search (optional)
+      <input
+        type="search"
+        formControlName="search"
+        placeholder="Product or category name"
+      />
+    </label>
+    <button class="btn" type="submit" [disabled]="downloading">
+      {{ downloading ? "Generating..." : "Download Report" }}
+    </button>
+  </form>
+
+  @if (error) {
+  <p class="error">{{ error }}</p>
+  }
+</section>

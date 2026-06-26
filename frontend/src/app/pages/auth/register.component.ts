@@ -7,70 +7,8 @@ import { AuthService } from '../../core/auth.service';
   selector: 'app-register',
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink],
-  template: `
-    <section class="card">
-      <h2>Register</h2>
-      <form [formGroup]="form" (ngSubmit)="submit()">
-        <label>
-          Email
-          <input type="email" formControlName="email" />
-        </label>
-        <label>
-          Password
-          <input type="password" formControlName="password" />
-        </label>
-        @if (error) {
-          <p class="error">{{ error }}</p>
-        }
-        <button type="submit" [disabled]="form.invalid || loading">Register</button>
-      </form>
-      <p>Already have an account? <a routerLink="/login">Login</a></p>
-    </section>
-  `,
-  styles: [
-    `
-      .card {
-        max-width: 400px;
-        margin: 0 auto;
-        background: #fff;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        padding: 1.5rem;
-      }
-      form {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-      }
-      label {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-        font-size: 0.875rem;
-      }
-      input {
-        padding: 0.5rem;
-        border: 1px solid #cbd5e1;
-        border-radius: 4px;
-      }
-      button {
-        padding: 0.5rem 1rem;
-        background: #2563eb;
-        color: #fff;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-      button:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-      }
-      .error {
-        color: #dc2626;
-        margin: 0;
-      }
-    `,
-  ],
+  templateUrl: './register.component.html',
+  styleUrl: './register.component.scss',
 })
 export class RegisterComponent {
   private fb = inject(FormBuilder);

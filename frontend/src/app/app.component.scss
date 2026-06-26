@@ -1,7 +1,9 @@
+@use '../styles/variables' as *;
+
 .app-header {
-  background: #1e293b;
+  background: $color-header;
   color: #fff;
-  padding: 1rem 0;
+  padding: $spacing-md 0;
   margin-bottom: 2rem;
 
   .container {
@@ -16,9 +18,9 @@
   }
 
   nav a {
-    color: #cbd5e1;
+    color: $color-header-link;
     text-decoration: none;
-    margin-left: 1rem;
+    margin-left: $spacing-md;
 
     &.active,
     &:hover {
@@ -29,9 +31,9 @@
   .link-btn {
     background: none;
     border: none;
-    color: #cbd5e1;
+    color: $color-header-link;
     cursor: pointer;
-    margin-left: 1rem;
+    margin-left: $spacing-md;
     font-size: inherit;
 
     &:hover {
@@ -41,7 +43,7 @@
 }
 
 .container {
-  max-width: 1100px;
+  max-width: $container-max;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 $spacing-md;
 }

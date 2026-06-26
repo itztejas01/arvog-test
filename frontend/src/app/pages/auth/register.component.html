@@ -1,0 +1,22 @@
+<section class="card card--narrow">
+  <h2>Register</h2>
+  <form class="form-stack" [formGroup]="form" (ngSubmit)="submit()">
+    <label class="field">
+      Email
+      <input type="email" formControlName="email" />
+    </label>
+    <label class="field">
+      Password
+      <input type="password" formControlName="password" />
+    </label>
+    @if (error) {
+    <p class="error">{{ error }}</p>
+    }
+    <button class="btn" type="submit" [disabled]="form.invalid || loading">
+      Register
+    </button>
+  </form>
+  <p class="auth-footer">
+    Already have an account? <a routerLink="/login">Login</a>
+  </p>
+</section>
