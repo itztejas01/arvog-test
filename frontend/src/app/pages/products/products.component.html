@@ -69,7 +69,7 @@
             @for (product of products; track product.id) {
               <tr [class]="tableRowClass">
                 <td [class]="tableCellClass">
-                  @if (productService.imageUrl(product.imagePath); as url) {
+                  @if (productService.imageUrl(product); as url) {
                     <img [src]="url" alt="" class="h-12 w-12 rounded-md object-cover" />
                   } @else {
                     <span class="text-muted-foreground">—</span>

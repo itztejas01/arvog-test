@@ -2,7 +2,9 @@ import { Response, Router } from "express";
 import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma";
 import { paramId } from "../lib/params";
-import { deleteImageFile, upload } from "../lib/upload";
+import { enrichProduct, enrichProducts } from "../lib/productPresenter";
+import { persistProductImage, removeProductImage } from "../lib/storage";
+import { upload } from "../lib/upload";
 import { AuthRequest, authMiddleware } from "../middleware/auth";
 import { productBodySchema } from "../validators/product";
 
@@ -15,7 +17,7 @@ router.get("/", async (_req, res: Response) => {
     include: { category: true },
     orderBy: { createdAt: "desc" },
   });
-  res.json(products);
+  res.json(await enrichProducts(products));
 });
 
 router.get("/list", async (req, res: Response) => {
@@ -45,7 +47,7 @@ router.get("/list", async (req, res: Response) => {
   ]);
 
   res.json({
-    data,
+    data: await enrichProducts(data),
     meta: {
       page,
       pageSize,
@@ -64,97 +66,89 @@ router.get("/:id", async (req, res: Response) => {
   if (!product) {
     return res.status(404).json({ error: "Product not found" });
   }
-  res.json(product);
+  res.json(await enrichProduct(product));
 });
 
-router.post(
-  "/",
-  upload.single("image"),
-  async (req: AuthRequest, res: Response) => {
-    const parsed = productBodySchema.safeParse(req.body);
-    if (!parsed.success) {
-      if (req.file) deleteImageFile(req.file.filename);
-      return res.status(400).json({ error: parsed.error.flatten() });
-    }
-
-    const category = await prisma.category.findUnique({
-      where: { id: parsed.data.categoryId },
-    });
-    if (!category) {
-      if (req.file) deleteImageFile(req.file.filename);
-      return res.status(400).json({ error: "Category not found" });
-    }
-
-    const product = await prisma.product.create({
-      data: {
-        name: parsed.data.name,
-        price: parsed.data.price,
-        categoryId: parsed.data.categoryId,
-        imagePath: req.file?.filename ?? null,
-      },
-      include: { category: true },
-    });
-
-    res.status(201).json(product);
+router.post("/", upload.single("image"), async (req: AuthRequest, res: Response) => {
+  const parsed = productBodySchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.flatten() });
   }
-);
 
-router.put(
-  "/:id",
-  upload.single("image"),
-  async (req: AuthRequest, res: Response) => {
-    const parsed = productBodySchema.safeParse(req.body);
-    if (!parsed.success) {
-      if (req.file) deleteImageFile(req.file.filename);
-      return res.status(400).json({ error: parsed.error.flatten() });
-    }
-
-    const id = paramId(req.params.id);
-    const existing = await prisma.product.findUnique({
-      where: { id },
-    });
-    if (!existing) {
-      if (req.file) deleteImageFile(req.file.filename);
-      return res.status(404).json({ error: "Product not found" });
-    }
-
-    const category = await prisma.category.findUnique({
-      where: { id: parsed.data.categoryId },
-    });
-    if (!category) {
-      if (req.file) deleteImageFile(req.file.filename);
-      return res.status(400).json({ error: "Category not found" });
-    }
-
-    if (req.file && existing.imagePath) {
-      deleteImageFile(existing.imagePath);
-    }
-
-    const product = await prisma.product.update({
-      where: { id },
-      data: {
-        name: parsed.data.name,
-        price: parsed.data.price,
-        categoryId: parsed.data.categoryId,
-        ...(req.file ? { imagePath: req.file.filename } : {}),
-      },
-      include: { category: true },
-    });
-
-    res.json(product);
-  }
-);
-
-router.delete("/:id", async (req: AuthRequest, res: Response) => {
-  const id = paramId(req.params.id);
-  const existing = await prisma.product.findUnique({
-    where: { id },
+  const category = await prisma.category.findUnique({
+    where: { id: parsed.data.categoryId },
   });
+  if (!category) {
+    return res.status(400).json({ error: "Category not found" });
+  }
+
+  let imagePath: string | null = null;
+  if (req.file) {
+    imagePath = await persistProductImage(req.file);
+  }
+
+  const product = await prisma.product.create({
+    data: {
+      name: parsed.data.name,
+      price: parsed.data.price,
+      categoryId: parsed.data.categoryId,
+      imagePath,
+    },
+    include: { category: true },
+  });
+
+  res.status(201).json(await enrichProduct(product));
+});
+
+router.put("/:id", upload.single("image"), async (req: AuthRequest, res: Response) => {
+  const parsed = productBodySchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.flatten() });
+  }
+
+  const id = paramId(req.params.id);
+  const existing = await prisma.product.findUnique({ where: { id } });
   if (!existing) {
     return res.status(404).json({ error: "Product not found" });
   }
 
-  deleteImageFile(existing.imagePath);
+  const category = await prisma.category.findUnique({
+    where: { id: parsed.data.categoryId },
+  });
+  if (!category) {
+    return res.status(400).json({ error: "Category not found" });
+  }
+
+  let imagePath = existing.imagePath;
+  if (req.file) {
+    if (existing.imagePath) {
+      await removeProductImage(existing.imagePath);
+    }
+    imagePath = await persistProductImage(req.file);
+  }
+
+  const product = await prisma.product.update({
+    where: { id },
+    data: {
+      name: parsed.data.name,
+      price: parsed.data.price,
+      categoryId: parsed.data.categoryId,
+      imagePath,
+    },
+    include: { category: true },
+  });
+
+  res.json(await enrichProduct(product));
+});
+
+router.delete("/:id", async (req: AuthRequest, res: Response) => {
+  const id = paramId(req.params.id);
+  const existing = await prisma.product.findUnique({ where: { id } });
+  if (!existing) {
+    return res.status(404).json({ error: "Product not found" });
+  }
+
+  await removeProductImage(existing.imagePath);
   await prisma.product.delete({ where: { id } });
   res.status(204).send();
 });

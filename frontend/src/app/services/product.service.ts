@@ -5,6 +5,7 @@ export interface Product {
   id: string;
   name: string;
   imagePath: string | null;
+  imageUrl?: string | null;
   price: string;
   categoryId: string;
   category?: { id: string; name: string };
@@ -36,8 +37,9 @@ export class ProductService {
     return this.http.delete(`/api/products/${id}`);
   }
 
-  imageUrl(imagePath: string | null): string | null {
-    return imagePath ? `/api/uploads/${imagePath}` : null;
+  imageUrl(product: Pick<Product, 'imagePath' | 'imageUrl'>): string | null {
+    if (product.imageUrl) return product.imageUrl;
+    return product.imagePath ? `/api/uploads/${product.imagePath}` : null;
   }
 
   listPaginated(params: {
