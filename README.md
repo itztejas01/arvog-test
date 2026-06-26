@@ -1,11 +1,11 @@
-# Product Management System
+# Avrog
 
-Angular + Node.js (Express) + PostgreSQL monorepo implementing user auth, category/product CRUD, server-side product listing, bulk upload, and report export.
+Product management platform built with Angular, Node.js, and PostgreSQL — user auth, category/product CRUD, server-side listing, bulk upload, and report export.
 
 ## Prerequisites
 
 - Node.js 20+
-- Docker (for PostgreSQL)
+- Docker (for local PostgreSQL)
 - npm
 
 ## Quick Start
@@ -16,7 +16,7 @@ Angular + Node.js (Express) + PostgreSQL monorepo implementing user auth, catego
 docker compose up -d
 ```
 
-### 2. Backend
+### 2. Backend API
 
 ```bash
 cd backend
@@ -29,7 +29,7 @@ npm run dev
 
 API runs at `http://localhost:3000`.
 
-### 3. Frontend
+### 3. Web App
 
 ```bash
 cd frontend
@@ -45,52 +45,17 @@ App runs at `http://localhost:4200` (proxies `/api` to the backend).
 |-------|----------|
 | admin@example.com | admin123 |
 
-Seed data includes sample categories (Electronics, Clothing, Books) and products.
-
-## API Overview
-
-| Method | Route | Auth | Description |
-|--------|-------|------|-------------|
-| GET | `/api/health` | No | Health check |
-| POST | `/api/auth/register` | No | Register user |
-| POST | `/api/auth/login` | No | Login, returns JWT |
-| GET | `/api/users/me` | Yes | Current user |
-| CRUD | `/api/categories` | Yes | Category management |
-| CRUD | `/api/products` | Yes | Product management (multipart for images) |
-| GET | `/api/products/list` | Yes | Paginated list with sort & search |
-| POST | `/api/products/bulk-upload` | Yes | CSV/XLSX bulk import |
-| GET | `/api/reports/products` | Yes | Stream CSV/XLSX report download |
-
-### Product List Query Params
-
-- `page` (default 1)
-- `pageSize` (default 10, max 100)
-- `sortOrder` — `asc` or `desc` (by price)
-- `search` — matches product name or category name
-
-### Bulk Upload Format
-
-CSV or XLSX with columns: `name`, `price`, `categoryName`.
-
 ## Project Structure
 
 ```
-project/
-├── backend/          # Express + TypeScript + Prisma
-├── frontend/         # Angular 19 standalone components
+avrog/
+├── backend/          # Avrog API (Express + Prisma)
+├── frontend/         # Avrog Web (Angular)
 ├── docker-compose.yml
+├── infra/            # AWS serverless infrastructure (upcoming)
 └── docs/
 ```
 
-## Git History (phased commits)
+## License
 
-Each feature was committed separately:
-
-1. `chore:` monorepo scaffold
-2. `feat:` user auth (JWT)
-3. `feat:` category CRUD
-4. `feat:` product CRUD + image upload
-5. `feat:` server-side product list
-6. `feat:` bulk upload
-7. `feat:` report export
-8. `docs:` setup guide, seed, error handling
+Private

@@ -1,0 +1,10 @@
+{
+  "name": "avrog",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Avrog — serverless product management platform",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ]
+}

@@ -1,16 +1,16 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: project-postgres
+    container_name: avrog-postgres
     restart: unless-stopped
     ports:
       - "5432:5432"
     environment:
       POSTGRES_USER: appuser
       POSTGRES_PASSWORD: apppassword
-      POSTGRES_DB: productdb
+      POSTGRES_DB: avrogdb
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - avrog_postgres_data:/var/lib/postgresql/data
 
 volumes:
-  postgres_data:
+  avrog_postgres_data:
