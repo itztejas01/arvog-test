@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import express from "express";
 import { prisma } from "./lib/prisma";
 import authRoutes from "./routes/auth";
+import bulkRoutes from "./routes/bulk";
 import categoryRoutes from "./routes/categories";
 import productRoutes from "./routes/products";
 import userRoutes from "./routes/users";
@@ -30,6 +31,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/products", bulkRoutes);
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
