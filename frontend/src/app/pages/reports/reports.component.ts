@@ -10,7 +10,10 @@ import { ReportService } from '../../services/report.service';
   template: `
     <section class="card">
       <h2>Product Reports</h2>
-      <p>Download product data as CSV or XLSX. Large exports are streamed to avoid timeouts.</p>
+      <p>
+        Download product data as CSV or XLSX. Large exports are streamed to
+        avoid timeouts.
+      </p>
 
       <form [formGroup]="form" (ngSubmit)="download()" class="report-form">
         <label>
@@ -25,13 +28,17 @@ import { ReportService } from '../../services/report.service';
           <select formControlName="categoryId">
             <option value="">All categories</option>
             @for (cat of categories; track cat.id) {
-              <option [value]="cat.id">{{ cat.name }}</option>
+            <option [value]="cat.id">{{ cat.name }}</option>
             }
           </select>
         </label>
         <label>
           Search (optional)
-          <input type="search" formControlName="search" placeholder="Product or category name" />
+          <input
+            type="search"
+            formControlName="search"
+            placeholder="Product or category name"
+          />
         </label>
         <button type="submit" [disabled]="downloading">
           {{ downloading ? 'Generating...' : 'Download Report' }}
@@ -39,7 +46,7 @@ import { ReportService } from '../../services/report.service';
       </form>
 
       @if (error) {
-        <p class="error">{{ error }}</p>
+      <p class="error">{{ error }}</p>
       }
     </section>
   `,

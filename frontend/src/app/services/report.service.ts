@@ -1,11 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { AuthService } from '../core/auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class ReportService {
   private http = inject(HttpClient);
-  private auth = inject(AuthService);
 
   download(format: 'csv' | 'xlsx', categoryId?: string, search?: string) {
     let params = new HttpParams().set('format', format);

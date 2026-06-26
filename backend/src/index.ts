@@ -9,6 +9,7 @@ import categoryRoutes from "./routes/categories";
 import productRoutes from "./routes/products";
 import reportRoutes from "./routes/reports";
 import userRoutes from "./routes/users";
+import { errorHandler } from "./middleware/errorHandler";
 
 dotenv.config();
 
@@ -34,6 +35,8 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/products", bulkRoutes);
 app.use("/api/reports", reportRoutes);
+
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);

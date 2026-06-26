@@ -1,5 +1,6 @@
 import { Response, Router } from "express";
 import { prisma } from "../lib/prisma";
+import { paramId } from "../lib/params";
 import { AuthRequest, authMiddleware } from "../middleware/auth";
 import { categorySchema } from "../validators/category";
 
@@ -15,8 +16,9 @@ router.get("/", async (_req, res: Response) => {
 });
 
 router.get("/:id", async (req, res: Response) => {
+  const id = paramId(req.params.id);
   const category = await prisma.category.findUnique({
-    where: { id: req.params.id },
+    where: { id },
   });
   if (!category) {
     return res.status(404).json({ error: "Category not found" });
@@ -41,8 +43,9 @@ router.put("/:id", async (req: AuthRequest, res: Response) => {
   }
 
   try {
+    const id = paramId(req.params.id);
     const category = await prisma.category.update({
-      where: { id: req.params.id },
+      where: { id },
       data: parsed.data,
     });
     res.json(category);
@@ -52,8 +55,9 @@ router.put("/:id", async (req: AuthRequest, res: Response) => {
 });
 
 router.delete("/:id", async (req: AuthRequest, res: Response) => {
+  const id = paramId(req.params.id);
   const productCount = await prisma.product.count({
-    where: { categoryId: req.params.id },
+    where: { categoryId: id },
   });
   if (productCount > 0) {
     return res
@@ -62,7 +66,7 @@ router.delete("/:id", async (req: AuthRequest, res: Response) => {
   }
 
   try {
-    await prisma.category.delete({ where: { id: req.params.id } });
+    await prisma.category.delete({ where: { id } });
     res.status(204).send();
   } catch {
     res.status(404).json({ error: "Category not found" });

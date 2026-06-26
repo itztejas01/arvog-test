@@ -1,6 +1,7 @@
 import { Response, Router } from "express";
 import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma";
+import { paramId } from "../lib/params";
 import { deleteImageFile, upload } from "../lib/upload";
 import { AuthRequest, authMiddleware } from "../middleware/auth";
 import { productBodySchema } from "../validators/product";
@@ -55,8 +56,9 @@ router.get("/list", async (req, res: Response) => {
 });
 
 router.get("/:id", async (req, res: Response) => {
+  const id = paramId(req.params.id);
   const product = await prisma.product.findUnique({
-    where: { id: req.params.id },
+    where: { id },
     include: { category: true },
   });
   if (!product) {
@@ -107,8 +109,9 @@ router.put(
       return res.status(400).json({ error: parsed.error.flatten() });
     }
 
+    const id = paramId(req.params.id);
     const existing = await prisma.product.findUnique({
-      where: { id: req.params.id },
+      where: { id },
     });
     if (!existing) {
       if (req.file) deleteImageFile(req.file.filename);
@@ -128,7 +131,7 @@ router.put(
     }
 
     const product = await prisma.product.update({
-      where: { id: req.params.id },
+      where: { id },
       data: {
         name: parsed.data.name,
         price: parsed.data.price,
@@ -143,15 +146,16 @@ router.put(
 );
 
 router.delete("/:id", async (req: AuthRequest, res: Response) => {
+  const id = paramId(req.params.id);
   const existing = await prisma.product.findUnique({
-    where: { id: req.params.id },
+    where: { id },
   });
   if (!existing) {
     return res.status(404).json({ error: "Product not found" });
   }
 
   deleteImageFile(existing.imagePath);
-  await prisma.product.delete({ where: { id: req.params.id } });
+  await prisma.product.delete({ where: { id } });
   res.status(204).send();
 });
 
