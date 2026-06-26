@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import express from "express";
 import { prisma } from "./lib/prisma";
 import authRoutes from "./routes/auth";
+import categoryRoutes from "./routes/categories";
 import userRoutes from "./routes/users";
 
 dotenv.config();
@@ -24,6 +25,7 @@ app.get("/api/health", async (_req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/categories", categoryRoutes);
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
