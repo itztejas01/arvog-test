@@ -1,32 +1,44 @@
 import { Response, Router } from "express";
+import { asyncHandler } from "../lib/asyncHandler";
+import { prisma } from "../lib/prisma";
 import { authMiddleware } from "../middleware/auth";
-import { streamProductsCsv, streamProductsXlsx } from "../services/reportExport";
+import {
+  streamProductsCsv,
+  streamProductsXlsx,
+} from "../services/reportExport";
+import { reportQuerySchema } from "../validators/report";
 
 const router = Router();
 
-router.get("/products", authMiddleware, async (req, res: Response) => {
-  req.setTimeout(10 * 60 * 1000);
-  res.setTimeout(10 * 60 * 1000);
+router.get(
+  "/products",
+  authMiddleware,
+  asyncHandler(async (req, res: Response) => {
+    req.setTimeout(10 * 60 * 1000);
+    res.setTimeout(10 * 60 * 1000);
 
-  const formatType = req.query.format === "xlsx" ? "xlsx" : "csv";
-  const categoryId =
-    typeof req.query.categoryId === "string" ? req.query.categoryId : undefined;
-  const search =
-    typeof req.query.search === "string" ? req.query.search : undefined;
+    const parsed = reportQuerySchema.safeParse(req.query);
+    if (!parsed.success) {
+      return res.status(400).json({ error: parsed.error.flatten() });
+    }
 
-  try {
-    if (formatType === "xlsx") {
+    const { format, categoryId, search } = parsed.data;
+
+    if (categoryId) {
+      const category = await prisma.category.findUnique({
+        where: { id: categoryId },
+      });
+      if (!category) {
+        return res.status(400).json({ error: "Category not found" });
+      }
+    }
+
+    if (format === "xlsx") {
       await streamProductsXlsx(res, categoryId, search);
     } else {
       await streamProductsCsv(res, categoryId, search);
     }
-  } catch (error) {
-    if (!res.headersSent) {
-      res.status(500).json({
-        error: error instanceof Error ? error.message : "Report export failed",
-      });
-    }
-  }
-});
+  }),
+);
 
 export default router;

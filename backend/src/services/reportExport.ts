@@ -20,7 +20,9 @@ function buildWhere(
     filters.push({
       OR: [
         { name: { contains: search.trim(), mode: "insensitive" } },
-        { category: { name: { contains: search.trim(), mode: "insensitive" } } },
+        {
+          category: { name: { contains: search.trim(), mode: "insensitive" } },
+        },
       ],
     });
   }
@@ -49,7 +51,7 @@ export async function streamProductsCsv(
   categoryId?: string,
   search?: string,
 ) {
-  res.setHeader("Content-Type", "text/csv");
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
   res.setHeader(
     "Content-Disposition",
     'attachment; filename="products-report.csv"',
@@ -91,7 +93,9 @@ export async function streamProductsXlsx(
 
   const workbook = new ExcelJS.stream.xlsx.WorkbookWriter({ stream: res });
   const sheet = workbook.addWorksheet("Products");
-  sheet.addRow(["ID", "Name", "Price", "Category", "Image Path", "Created At"]).commit();
+  sheet
+    .addRow(["ID", "Name", "Price", "Category", "Image Path", "Created At"])
+    .commit();
 
   const where = buildWhere(categoryId, search);
   for await (const batch of productBatches(where)) {

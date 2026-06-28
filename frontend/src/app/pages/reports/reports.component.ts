@@ -55,18 +55,16 @@ export class ReportsComponent implements OnInit {
     this.error = '';
     const { format, categoryId, search } = this.form.getRawValue();
 
-    this.reportService
-      .download(format!, categoryId || undefined, search || undefined)
-      .subscribe({
-        next: (blob) => {
-          const ext = format === 'xlsx' ? 'xlsx' : 'csv';
-          this.reportService.triggerDownload(blob, `products-report.${ext}`);
-          this.downloading = false;
-        },
-        error: () => {
-          this.error = 'Failed to download report';
-          this.downloading = false;
-        },
-      });
+    try {
+      this.reportService.download(
+        format!,
+        categoryId || undefined,
+        search || undefined,
+      );
+    } catch {
+      this.error = 'Failed to download report';
+    } finally {
+      this.downloading = false;
+    }
   }
 }
