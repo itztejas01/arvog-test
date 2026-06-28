@@ -15,13 +15,13 @@ interface LoginResponse {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly tokenKey = 'auth_token';
+  private readonly userKey = 'auth_user';
+
   readonly currentUser = signal<AuthUser | null>(null);
+  readonly sessionReady = signal(false);
 
   constructor(private http: HttpClient) {
-    const token = this.getToken();
-    if (token) {
-      this.loadProfile().subscribe({ error: () => this.logout() });
-    }
+    this.restoreSession();
   }
 
   register(email: string, password: string) {
@@ -33,14 +33,14 @@ export class AuthService {
       .post<LoginResponse>('/api/auth/login', { email, password })
       .pipe(
         tap((res) => {
-          localStorage.setItem(this.tokenKey, res.token);
-          this.currentUser.set(res.user);
-        })
+          this.persistSession(res.token, res.user);
+        }),
       );
   }
 
   logout() {
     localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem(this.userKey);
     this.currentUser.set(null);
   }
 
@@ -57,8 +57,52 @@ export class AuthService {
       .get<{ user: { userId: string; email: string } }>('/api/users/me')
       .pipe(
         tap((res) => {
-          this.currentUser.set({ id: res.user.userId, email: res.user.email });
-        })
+          const user = { id: res.user.userId, email: res.user.email };
+          this.currentUser.set(user);
+          localStorage.setItem(this.userKey, JSON.stringify(user));
+        }),
       );
+  }
+
+  private restoreSession() {
+    const token = this.getToken();
+    const cachedUser = this.readCachedUser();
+
+    if (cachedUser) {
+      this.currentUser.set(cachedUser);
+    }
+
+    if (!token) {
+      this.sessionReady.set(true);
+      return;
+    }
+
+    this.loadProfile().subscribe({
+      next: () => this.sessionReady.set(true),
+      error: (err) => {
+        if (err.status === 401) {
+          this.logout();
+        }
+        this.sessionReady.set(true);
+      },
+    });
+  }
+
+  private persistSession(token: string, user: AuthUser) {
+    localStorage.setItem(this.tokenKey, token);
+    localStorage.setItem(this.userKey, JSON.stringify(user));
+    this.currentUser.set(user);
+    this.sessionReady.set(true);
+  }
+
+  private readCachedUser(): AuthUser | null {
+    const raw = localStorage.getItem(this.userKey);
+    if (!raw) return null;
+
+    try {
+      return JSON.parse(raw) as AuthUser;
+    } catch {
+      return null;
+    }
   }
 }

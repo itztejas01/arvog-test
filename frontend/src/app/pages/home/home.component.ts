@@ -23,10 +23,25 @@ import {
 })
 export class HomeComponent {
   quickLinks = [
-    { path: '/categories', title: 'Categories', description: 'Create and organize product categories.' },
-    { path: '/products', title: 'Products', description: 'Add products with images and pricing.' },
-    { path: '/product-list', title: 'Product List', description: 'Browse with search, sort, and pagination.' },
-    { path: '/bulk-upload', title: 'Bulk Upload', description: 'Import thousands of products via CSV or XLSX.' },
-    { path: '/reports', title: 'Reports', description: 'Export catalog data as CSV or XLSX.' },
+    {
+      path: '/categories',
+      title: 'Categories',
+      description: 'Create and organize product categories.',
+    },
+    {
+      path: '/products',
+      title: 'Products',
+      description: 'Browse, search, add, and edit products.',
+    },
+    {
+      path: '/bulk-upload',
+      title: 'Bulk Upload',
+      description: 'Import thousands of products via CSV or XLSX.',
+    },
+    {
+      path: '/reports',
+      title: 'Reports',
+      description: 'Export catalog data as CSV or XLSX.',
+    },
   ];
 }

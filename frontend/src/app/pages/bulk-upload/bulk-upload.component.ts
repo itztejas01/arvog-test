@@ -8,6 +8,7 @@ import {
   UiButtonComponent,
   UiCardComponent,
   UiCardContentComponent,
+  UiFileInputComponent,
   uiTableCellClass,
   uiTableClass,
   uiTableHeadClass,
@@ -18,7 +19,13 @@ import {
 @Component({
   selector: 'app-bulk-upload',
   standalone: true,
-  imports: [UiButtonComponent, UiCardComponent, UiCardContentComponent, UiBadgeComponent],
+  imports: [
+    UiButtonComponent,
+    UiCardComponent,
+    UiCardContentComponent,
+    UiBadgeComponent,
+    UiFileInputComponent,
+  ],
   templateUrl: './bulk-upload.component.html',
 })
 export class BulkUploadComponent {
@@ -35,11 +42,29 @@ export class BulkUploadComponent {
   error = '';
   result: BulkImportResult | null = null;
 
-  onFileChange(event: Event) {
-    const input = event.target as HTMLInputElement;
-    this.selectedFile = input.files?.[0] ?? null;
+  private readonly sampleCsv = [
+    'name,price,categoryName',
+    'Wireless Mouse,29.99,Electronics',
+    'USB Keyboard,49.99,Electronics',
+    'T-Shirt,19.99,Clothing',
+    'Jeans,59.99,Clothing',
+    'TypeScript Handbook,39.99,Books',
+  ].join('\n');
+
+  onFileChange(file: File | null) {
+    this.selectedFile = file;
     this.result = null;
     this.error = '';
+  }
+
+  downloadSample() {
+    const blob = new Blob([this.sampleCsv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'products-import-sample.csv';
+    anchor.click();
+    URL.revokeObjectURL(url);
   }
 
   upload() {

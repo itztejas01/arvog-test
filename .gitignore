@@ -5,7 +5,8 @@ dist/
 .DS_Store
 backend/uploads/*
 !backend/uploads/.gitkeep
-backend/uploads/temp/
+backend/uploads/photos/
+backend/uploads/bulk/
 frontend/.angular/
 frontend/dist/
 .vscode

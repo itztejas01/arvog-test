@@ -2,8 +2,12 @@ import fs from "fs";
 import { parse } from "csv-parse";
 import ExcelJS from "exceljs";
 import { prisma } from "../lib/prisma";
+import {
+  normalizeProductPrice,
+  productPriceErrorMessage,
+} from "../lib/productPrice";
 
-const BATCH_SIZE = 300;
+const BATCH_SIZE = 500;
 
 export interface BulkRow {
   name: string;
@@ -41,6 +45,73 @@ async function insertBatch(
   await prisma.product.createMany({ data: rows });
 }
 
+function validateRows(
+  rows: BulkRow[],
+  startRow: number,
+  categoryMap: Map<string, string>,
+  result: BulkImportResult,
+) {
+  const valid: { name: string; price: number; categoryId: string }[] = [];
+
+  rows.forEach((row, index) => {
+    const currentRow = startRow + index;
+    if (!row.name?.trim()) {
+      result.failed++;
+      result.errors.push({ row: currentRow, message: "Name is required" });
+      return;
+    }
+
+    const price = normalizeProductPrice(row.price);
+    if (price === null) {
+      result.failed++;
+      result.errors.push({
+        row: currentRow,
+        message: productPriceErrorMessage(),
+      });
+      return;
+    }
+
+    const categoryId = categoryMap.get(row.categoryName.trim().toLowerCase());
+    if (!categoryId) {
+      result.failed++;
+      result.errors.push({
+        row: currentRow,
+        message: `Category not found: ${row.categoryName}`,
+      });
+      return;
+    }
+
+    valid.push({ name: row.name.trim(), price, categoryId });
+  });
+
+  return valid;
+}
+
+async function flushBatch(
+  rows: BulkRow[],
+  startRow: number,
+  result: BulkImportResult,
+) {
+  const categoryMap = await resolveCategoryMap(rows.map((r) => r.categoryName));
+  const valid = validateRows(rows, startRow, categoryMap, result);
+
+  if (!valid || valid.length === 0) return;
+
+  try {
+    await insertBatch(valid);
+    result.imported += valid.length;
+  } catch (error) {
+    result.failed += valid.length;
+    result.errors.push({
+      row: startRow,
+      message:
+        error instanceof Error
+          ? `Batch insert failed: ${error.message}`
+          : "Batch insert failed",
+    });
+  }
+}
+
 export async function importProductsFromCsv(
   filePath: string,
 ): Promise<BulkImportResult> {
@@ -57,59 +128,25 @@ export async function importProductsFromCsv(
     }),
   );
 
-  const flush = async (rows: BulkRow[], startRow: number) => {
-    const categoryMap = await resolveCategoryMap(rows.map((r) => r.categoryName));
-    const valid: { name: string; price: number; categoryId: string }[] = [];
-
-    rows.forEach((row, index) => {
-      const currentRow = startRow + index;
-      if (!row.name?.trim()) {
-        result.failed++;
-        result.errors.push({ row: currentRow, message: "Name is required" });
-        return;
-      }
-      const price = Number(row.price);
-      if (!Number.isFinite(price) || price <= 0) {
-        result.failed++;
-        result.errors.push({ row: currentRow, message: "Invalid price" });
-        return;
-      }
-      const categoryId = categoryMap.get(row.categoryName.trim().toLowerCase());
-      if (!categoryId) {
-        result.failed++;
-        result.errors.push({
-          row: currentRow,
-          message: `Category not found: ${row.categoryName}`,
-        });
-        return;
-      }
-      valid.push({ name: row.name.trim(), price, categoryId });
-    });
-
-    if (valid.length > 0) {
-      await insertBatch(valid);
-      result.imported += valid.length;
-    }
-  };
-
   let batchStartRow = 1;
   for await (const record of parser) {
     rowNumber++;
     pending.push({
       name: record.name ?? record.Name ?? "",
       price: Number(record.price ?? record.Price),
-      categoryName: record.categoryName ?? record.category ?? record.Category ?? "",
+      categoryName:
+        record.categoryName ?? record.category ?? record.Category ?? "",
     });
 
     if (pending.length >= BATCH_SIZE) {
-      await flush(pending, batchStartRow);
+      await flushBatch(pending, batchStartRow, result);
       pending.length = 0;
       batchStartRow = rowNumber + 1;
     }
   }
 
   if (pending.length > 0) {
-    await flush(pending, batchStartRow);
+    await flushBatch(pending, batchStartRow, result);
   }
 
   return result;
@@ -162,83 +199,14 @@ export async function importProductsFromXlsx(
     pending.push({ name, price, categoryName });
 
     if (pending.length >= BATCH_SIZE) {
-      const categoryMap = await resolveCategoryMap(
-        pending.map((r) => r.categoryName),
-      );
-      const valid: { name: string; price: number; categoryId: string }[] = [];
-
-      pending.forEach((item, index) => {
-        const currentRow = batchStartRow + index;
-        if (!item.name) {
-          result.failed++;
-          result.errors.push({ row: currentRow, message: "Name is required" });
-          return;
-        }
-        if (!Number.isFinite(item.price) || item.price <= 0) {
-          result.failed++;
-          result.errors.push({ row: currentRow, message: "Invalid price" });
-          return;
-        }
-        const categoryId = categoryMap.get(item.categoryName.toLowerCase());
-        if (!categoryId) {
-          result.failed++;
-          result.errors.push({
-            row: currentRow,
-            message: `Category not found: ${item.categoryName}`,
-          });
-          return;
-        }
-        valid.push({
-          name: item.name,
-          price: item.price,
-          categoryId,
-        });
-      });
-
-      if (valid.length > 0) {
-        await insertBatch(valid);
-        result.imported += valid.length;
-      }
-
+      await flushBatch(pending, batchStartRow, result);
       pending.length = 0;
       batchStartRow = rowNum + 1;
     }
   }
 
   if (pending.length > 0) {
-    const categoryMap = await resolveCategoryMap(
-      pending.map((r) => r.categoryName),
-    );
-    const valid: { name: string; price: number; categoryId: string }[] = [];
-
-    pending.forEach((item, index) => {
-      const currentRow = batchStartRow + index;
-      if (!item.name) {
-        result.failed++;
-        result.errors.push({ row: currentRow, message: "Name is required" });
-        return;
-      }
-      if (!Number.isFinite(item.price) || item.price <= 0) {
-        result.failed++;
-        result.errors.push({ row: currentRow, message: "Invalid price" });
-        return;
-      }
-      const categoryId = categoryMap.get(item.categoryName.toLowerCase());
-      if (!categoryId) {
-        result.failed++;
-        result.errors.push({
-          row: currentRow,
-          message: `Category not found: ${item.categoryName}`,
-        });
-        return;
-      }
-      valid.push({ name: item.name, price: item.price, categoryId });
-    });
-
-    if (valid.length > 0) {
-      await insertBatch(valid);
-      result.imported += valid.length;
-    }
+    await flushBatch(pending, batchStartRow, result);
   }
 
   return result;

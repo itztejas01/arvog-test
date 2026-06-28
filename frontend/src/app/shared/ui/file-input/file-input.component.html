@@ -1,0 +1,15 @@
+<div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+  <input
+    #fileInput
+    type="file"
+    class="hidden"
+    [accept]="accept()"
+    (change)="onNativeChange($event)"
+  />
+  <ui-button type="button" variant="outline" (clicked)="fileInput.click()">
+    Choose file
+  </ui-button>
+  <span class="truncate text-sm" [class.text-muted-foreground]="!fileName()">
+    {{ fileName() || placeholder() }}
+  </span>
+</div>

@@ -1,0 +1,45 @@
+@if (open()) {
+  <div class="fixed inset-0 z-50">
+    <button
+      type="button"
+      class="fixed inset-0 bg-black/40 backdrop-blur-[1px]"
+      aria-label="Close drawer"
+      (click)="closed.emit()"
+    ></button>
+    <aside
+      class="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-border bg-background shadow-2xl"
+      role="dialog"
+      [attr.aria-label]="title()"
+    >
+      <header
+        class="flex shrink-0 items-center justify-between border-b border-border px-6 py-4"
+      >
+        <h2 class="text-lg font-semibold">{{ title() }}</h2>
+        <button
+          type="button"
+          class="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          aria-label="Close"
+          (click)="closed.emit()"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+          </svg>
+        </button>
+      </header>
+      <div class="flex-1 overflow-y-auto p-6">
+        <ng-content />
+      </div>
+    </aside>
+  </div>
+}

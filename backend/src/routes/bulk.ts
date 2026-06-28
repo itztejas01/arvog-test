@@ -2,19 +2,15 @@ import fs from "fs";
 import multer from "multer";
 import path from "path";
 import { Response, Router } from "express";
+import { bulkUploadDir } from "../lib/storage";
 import { authMiddleware } from "../middleware/auth";
 import {
   importProductsFromCsv,
   importProductsFromXlsx,
 } from "../services/bulkImport";
 
-const uploadDir = path.join(__dirname, "../../uploads/temp");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
 const upload = multer({
-  dest: uploadDir,
+  dest: bulkUploadDir,
   limits: { fileSize: 50 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
